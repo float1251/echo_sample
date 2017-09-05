@@ -16,3 +16,7 @@ func NewUserModel(name string) *UserModel {
 	u := &UserModel{Uuid: uuid.NewV1(), Name: name}
 	return u
 }
+
+func Migrate(db *gorm.DB) {
+	db.AutoMigrate(&UserModel{})
+}

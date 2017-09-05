@@ -24,7 +24,7 @@ func main() {
 	defer db.Close()
 
 	// migration
-	db.AutoMigrate(&model.UserModel{})
+	model.Migrate(db)
 
 	router.SetRouting(e, db)
 
