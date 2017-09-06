@@ -14,10 +14,23 @@ func main() {
 
 	// middleware
 	e.Use(middleware.Logger())
+	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte("secret"),
+		Skipper: func(c echo.Context) bool {
+			if c.Path() == "/user/create/" ||
+				c.Path() == "/user/login/" ||
+				c.Path() == "/not_restricted/" {
+				return true
+			}
+			return false
+		},
+	}))
 	e.Use(middleware.Recover())
 
 	// db
-	db, err := gorm.Open("sqlite3", "/tmp/gorm.db")
+	db, err := gorm.Open("sqlite3", "/tmp/gorm.db?cache=shared")
+	db.DB().SetMaxOpenConns(100)
+	db.DB().SetMaxIdleConns(10)
 	if err != nil {
 		panic(err)
 	}

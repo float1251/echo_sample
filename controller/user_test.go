@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"bytes"
@@ -33,10 +34,10 @@ func TestMain(m *testing.M) {
 
 func TestUserCreate(t *testing.T) {
 	e := echo.New()
-	arg := &UserCreateRequest{Password: "test", Name: "ttt"}
+	arg := &UserCreateRequest{Password: "test", UserName: "ttt"}
 
 	body, _ := json.Marshal(arg)
-	req := httptest.NewRequest(echo.POST, "/user/create/124", bytes.NewReader(body))
+	req := httptest.NewRequest(echo.POST, "/user/create/", bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -50,5 +51,26 @@ func TestUserCreate(t *testing.T) {
 		db.Where(tmp).First(u)
 		assert.Equal(t, uint(1), u.Model.ID)
 		assert.Equal(t, "ttt", u.Name)
+	}
+}
+
+func TestUserLogin(t *testing.T) {
+	// create new user
+	u := model.NewUserModel("test", []byte("password"))
+	db.Create(u)
+
+	// login処理
+	e := echo.New()
+	arg := &UserLoginRequest{ID: strconv.FormatUint(uint64(u.ID), 10), Password: "password"}
+	body, _ := json.Marshal(arg)
+	req := httptest.NewRequest(echo.POST, "/user/login/", bytes.NewReader(body))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(t, h.Login(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.NotNil(t, rec.Body)
+		t.Log(rec.Body.String())
 	}
 }
