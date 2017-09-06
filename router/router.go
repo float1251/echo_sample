@@ -12,6 +12,6 @@ func SetRouting(e *echo.Echo, db *gorm.DB) {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello World")
 	})
-	e.GET("/user/login/:id", u.Login)
-	e.GET("/user/create/:id", u.UserCreate)
+	e.POST("/user/login/", u.Login)
+	e.POST("/user/create/", u.UserCreate)
 }

@@ -5,6 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"bytes"
+	"encoding/json"
 	"github.com/float1251/echo_sample/model"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -31,7 +33,10 @@ func TestMain(m *testing.M) {
 
 func TestUserCreate(t *testing.T) {
 	e := echo.New()
-	req := httptest.NewRequest(echo.POST, "/user/create/124", nil)
+	arg := &UserCreateRequest{Password: "test", Name: "ttt"}
+
+	body, _ := json.Marshal(arg)
+	req := httptest.NewRequest(echo.POST, "/user/create/124", bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -39,5 +44,11 @@ func TestUserCreate(t *testing.T) {
 	// Assertions
 	if assert.NoError(t, h.UserCreate(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
+		u := &model.UserModel{}
+		tmp := &model.UserModel{}
+		tmp.ID = 1
+		db.Where(tmp).First(u)
+		assert.Equal(t, uint(1), u.Model.ID)
+		assert.Equal(t, "ttt", u.Name)
 	}
 }

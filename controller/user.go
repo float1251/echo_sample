@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/float1251/echo_sample/model"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 	"github.com/satori/go.uuid"
 	"net/http"
-	"strconv"
 )
 
 type handler struct {
@@ -23,7 +24,18 @@ type UserCreateResponse struct {
 	Name string
 }
 
+type UserCreateRequest struct {
+	Password string `json:"password"`
+	UserName string `json:"user_name"`
+}
+
 type UserLoginResponse struct {
+	Token string
+}
+
+type UserLoginRequest struct {
+	ID       string
+	Password string
 }
 
 func NewUserHandler(d *gorm.DB) *UserHandler {
@@ -33,15 +45,29 @@ func NewUserHandler(d *gorm.DB) *UserHandler {
 }
 
 func (h *UserHandler) Login(c echo.Context) error {
+	req := new(UserLoginRequest)
+	if err := c.Bind(req); err != nil {
+		return err
+	}
 	u := &model.UserModel{}
-	h.db.Where(&model.UserModel{Name: c.Param("id")}).First(u)
-	return c.String(http.StatusOK, "User: "+strconv.FormatUint(uint64(u.ID), 10)+", Name: "+u.Name)
+	h.db.Where(&model.UserModel{Name: req.ID}).First(u)
+	res := UserLoginResponse{Token: string(u.Password)}
+	return c.JSON(http.StatusOK, res)
 }
 
 func (h *UserHandler) UserCreate(c echo.Context) error {
-	id := c.Param("id")
-	u := model.NewUserModel(id)
+	req := new(UserCreateRequest)
+	if err := c.Bind(req); err != nil {
+		return err
+	}
+	Log(req)
+	u := model.NewUserModel(req.UserName, []byte(req.Password))
 	h.db.Create(u)
 	res := &UserCreateResponse{ID: u.ID, Uuid: u.Uuid, Name: u.Name}
 	return c.JSON(http.StatusOK, res)
+}
+
+func Log(i interface{}) {
+	j, _ := json.Marshal(i)
+	fmt.Println(string(j))
 }
