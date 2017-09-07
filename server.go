@@ -7,6 +7,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"net/http"
 )
 
 func main() {
@@ -27,6 +28,8 @@ func main() {
 	}))
 	e.Use(middleware.Recover())
 
+	e.HTTPErrorHandler = customHTTPErrorHandler
+
 	// db
 	db, err := gorm.Open("sqlite3", "/tmp/gorm.db?cache=shared")
 	db.DB().SetMaxOpenConns(100)
@@ -42,4 +45,22 @@ func main() {
 	router.SetRouting(e, db)
 
 	e.Logger.Fatal(e.Start(":1323"))
+}
+
+type APIError struct {
+	Code int
+	Msg  string
+}
+
+func customHTTPErrorHandler(err error, c echo.Context) {
+	code := http.StatusInternalServerError
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+	}
+
+	if !c.Response().Committed {
+		e := &APIError{Code: code, Msg: err.Error()}
+		c.JSON(http.StatusOK, e)
+	}
+	c.Logger().Error(err)
 }

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/float1251/echo_sample/controller"
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
@@ -10,7 +11,10 @@ import (
 func SetRouting(e *echo.Echo, db *gorm.DB) {
 	u := controller.NewUserHandler(db)
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello World")
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(jwt.MapClaims)
+		id := claims["id"].(string)
+		return c.String(http.StatusOK, "Welcome "+id+"!")
 	})
 	e.GET("/not_restricted/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello World Open")

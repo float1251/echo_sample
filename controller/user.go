@@ -39,8 +39,8 @@ type UserLoginResponse struct {
 }
 
 type UserLoginRequest struct {
-	ID       string
-	Password string
+	ID       string `json:"id"`
+	Password string `json:"password"`
 }
 
 func NewUserHandler(d *gorm.DB) *UserHandler {
@@ -82,7 +82,7 @@ func login(h *UserHandler, id string, password string) error {
 	u := new(model.UserModel)
 	id_uint, err := strconv.ParseUint(id, 10, 64)
 	if err != nil {
-		return err
+		return errors.New("Parse Failed")
 	}
 	u.ID = uint(id_uint)
 	res := new(model.UserModel)
@@ -91,7 +91,7 @@ func login(h *UserHandler, id string, password string) error {
 		return errors.New("Not Exist")
 	}
 	if err = bcrypt.CompareHashAndPassword(res.Password, []byte(password)); err != nil {
-		return errors.New("Failed Login")
+		return err
 	}
 
 	return nil
