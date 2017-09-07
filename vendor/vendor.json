@@ -88,6 +88,12 @@
 			"revisionTime": "2017-09-01T08:40:05Z"
 		},
 		{
+			"checksumSHA1": "zZg0J0MqvnqXVYo644QDvnUinrc=",
+			"path": "github.com/pelletier/go-toml",
+			"revision": "1d6b12b7cb290426e27e6b4e38b89fcda3aeef03",
+			"revisionTime": "2017-09-04T19:58:09Z"
+		},
+		{
 			"checksumSHA1": "zKKp5SZ3d3ycKe4EKMNT0BqAWBw=",
 			"origin": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
 			"path": "github.com/pmezard/go-difflib/difflib",
