@@ -35,7 +35,7 @@ type UserCreateRequest struct {
 }
 
 type UserLoginResponse struct {
-	Token string
+	Token string `json:"token"`
 }
 
 type UserLoginRequest struct {
