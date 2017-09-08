@@ -19,12 +19,22 @@ type (
 	}
 )
 
+func GetAPIStructList() []interface{} {
+
+	var list []interface{}
+
+	// clientコードを出力するstructの設定
+	list = append(list, c.UserCreateRequest{})
+	list = append(list, c.UserLoginRequest{})
+
+	return list
+}
+
 func main() {
 	// 作成するStructの設定
 	var list []interface{}
 
-	list = append(list, c.UserCreateRequest{})
-	list = append(list, c.UserLoginRequest{})
+	list = GetAPIStructList()
 
 	var res []TemplateArgument
 	for i := 0; i < len(list); i++ {
@@ -41,14 +51,26 @@ func main() {
 	}
 
 	tpl, err := template.New("Client Code").Parse(`
+namespace API {
+	[System.Serializable]
+	public abstract class JsonMessage {
+	}
+
+	[System.Serializable]
+	public class BaseResponse {
+		public int Code { get; set; }
+		public JsonMessage { get; set; }
+	}
+
 {{- range . }}
 	[System.Serializable]
-	public class {{.Name}}  {
+	public class {{.Name}} : JsonMessage {
 		{{- range $v := .Fields }}
 		public {{.Type}} {{.JsonTag}} { get; set;}
 		{{- end }}
 	}
 {{- end }}
+}
 `)
 
 	if err != nil {

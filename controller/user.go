@@ -15,40 +15,42 @@ import (
 	"time"
 )
 
-type handler struct {
-	db *gorm.DB
-}
+type (
+	handler struct {
+		db *gorm.DB
+	}
 
-type UserHandler struct {
-	handler
-}
+	UserHandler struct {
+		handler
+	}
 
-type UserCreateResponse struct {
-	ID   uint      `json:"id"`
-	Uuid uuid.UUID `json:"uuid"`
-	Name string    `json:"name"`
-}
+	UserCreateResponse struct {
+		ID   uint      `json:"id"`
+		Uuid uuid.UUID `json:"uuid"`
+		Name string    `json:"name"`
+	}
 
-type JsonMessage interface{}
+	JsonMessage interface{}
 
-type BaseResponse struct {
-	Code    int         `json:"code"`
-	Message JsonMessage `json:"message"`
-}
+	BaseResponse struct {
+		Code    int         `json:"code"`
+		Message JsonMessage `json:"message"`
+	}
 
-type UserCreateRequest struct {
-	Password string `json:"password"`
-	UserName string `json:"user_name"`
-}
+	UserCreateRequest struct {
+		Password string `json:"password"`
+		UserName string `json:"user_name"`
+	}
 
-type UserLoginResponse struct {
-	Token string `json:"token"`
-}
+	UserLoginResponse struct {
+		Token string `json:"token"`
+	}
 
-type UserLoginRequest struct {
-	ID       string `json:"id"`
-	Password string `json:"password"`
-}
+	UserLoginRequest struct {
+		ID       string `json:"id"`
+		Password string `json:"password"`
+	}
+)
 
 func NewUserHandler(d *gorm.DB) *UserHandler {
 	u := new(UserHandler)
