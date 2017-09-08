@@ -24,9 +24,16 @@ type UserHandler struct {
 }
 
 type UserCreateResponse struct {
-	ID   uint
-	Uuid uuid.UUID
-	Name string
+	ID   uint      `json:"id"`
+	Uuid uuid.UUID `json:"uuid"`
+	Name string    `json:"name"`
+}
+
+type JsonMessage interface{}
+
+type BaseResponse struct {
+	Code    int         `json:"code"`
+	Message JsonMessage `json:"message"`
 }
 
 type UserCreateRequest struct {

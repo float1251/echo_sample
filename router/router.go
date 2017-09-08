@@ -17,7 +17,10 @@ func SetRouting(e *echo.Echo, db *gorm.DB) {
 		return c.String(http.StatusOK, "Welcome "+id+"!")
 	})
 	e.GET("/not_restricted/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello World Open")
+		b := controller.BaseResponse{}
+		b.Code = 200
+		b.Message = controller.UserLoginResponse{}
+		return c.JSON(http.StatusOK, b)
 	})
 	e.POST("/user/login/", u.Login)
 	e.POST("/user/create/", u.UserCreate)
